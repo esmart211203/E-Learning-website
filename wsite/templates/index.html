@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Trang chủ{% endblock title %}
+{% block content %}
+
+<div class="container">
+  {% comment %} main content {% endcomment %}
+  <main class="py-5">
+    <div class="row">
+      {% comment %} sidebar  {% endcomment %}
+      <div class="col-md-3">
+        {% include "sidebar.html" %}
+      </div>
+      {% comment %} content {% endcomment %}
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Đặt câu hỏi ngay bây giờ!</h5> </div>
+          <div class="card-body">
+            <p>Chọn môn học và chủ đề muốn đặt câu hỏi.</p>
+            <div class="row">
+              <div class="col-md-6">
+                <select class="form-control">
+                  <option value="">Môn học</option>
+                  <option value="toan-hoc">Toán Học</option>
+                  <option value="vat-ly">Vật Lý</option>
+                  <option value="hoa-hoc">Hóa Học</option>
+                  <option value="tieng-anh">Tiếng Anh</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <select class="form-control">
+                  <option value="">Lớp học</option>
+                  <option value="lop-6">Lớp 6</option>
+                  <option value="lop-7">Lớp 7</option>
+                  </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="container py-3">
+          <div class="row">
+              <div class="col-md-12 text-center">
+                  <a href="#" class="btn btn-lg btn-primary" id="openPopupBtn">Đặt câu hỏi ngay</a>
+              </div>
+          </div>
+        </section>
+        {% comment %} popup  {% endcomment %}
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close">&times;</span>
+                <form action="{% url "question.create" %}" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <h3 class="text-center">Câu hỏi của bạn</h3>
+                    <textarea class="form-control" id="content" name="content" rows="3" placeholder="Nhập nội dung bạn muốn hỏi" required></textarea>
+                  </div>
+                  <div class="d-flex justify-content-between mt-2">
+                    <select class="form-control sl" name="class">
+                      <option value="">Chọn lớp</option>
+                      {% for data in classes %}
+                          <option value="{{data.id}}">Lớp {{ data.class_number }}</option>
+                      {% endfor %}
+                    </select>
+                    <select class="form-control sl" name="subject">
+                      <option value="">Chọn môn</option>
+                      {% for data in subjects %}
+                        <option value="{{data.id}}">{{data.name}}</option>
+                      {% endfor %}
+                    </select>
+                    <select class="form-control" name="category">
+                      <option value="">Chọn chủ đề</option>
+                      {% for data in categories %}
+                        <option value="{{data.id}}">{{data.title}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="row g-3 align-items-center mt-1">
+                    <div class="col-auto">
+                      <input type="file" id="inputImage" name="sub_images" class="form-control" multiple>
+                    </div>
+                    <div class="col-auto">
+                      <span id="passwordHelpInline" class="form-text">
+                        You can choose 3 - 5 photos.
+                      </span>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-sm mt-3">Gửi câu hỏi</button>
+                </form>
+            </div>
+        </div>
+        {% comment %} view posts {% endcomment %}
+        <div class="row">
+            <div class="col-md-9">
+              {% for data in questions %}       
+                <div class="card mb-2 border border-gray-light rounded-lg shadow-sm" >
+                    <div class="card-header d-flex justify-content-between align-items-center" style="height: 70px">
+                        <div class="d-flex align-items-center">
+                            <img src="{% static "images/avatar.jpg" %}" style="width: 3rem; height: 3rem; object-fit: cover; border-radius: 50%; margin-right: 0.5rem;" alt="User avatar">
+                            <div class="flex-grow-1">
+                              <a href="#" class="text-dark text-xs font-medium hover:text-primary mt-1">
+                                <small>{{data.user.username}}</small>
+                              </a>
+                              <p class="text-gray-600 text-xs mt-0">{{data.created_at}}</p>
+                            </div>
+                        </div>
+                          
+                      <div class="d-flex align-items-center">
+                        <span class="badge bg-primary text-white" style="margin-right: 5px">{{data.subject}}</span>
+                        <span class="badge bg-secondary text-white" style="margin-right: 5px">{{data.getClass}}</span>
+                        <span class="badge bg-success text-white">10đ</span>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-title text-dark break-words">{{data.content}}</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                      <div class="d-flex">
+                        <div class="d-flex align-items-center" style="margin-right: 10px">
+                          <i class="fas fa-thumbs-up"></i> <span class="text-gray-600 text-xs ml-1">0</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <i class="fas fa-thumbs-down"></i> <span class="text-gray-600 text-xs ml-1">0</span>
+                        </div>
+                      </div>
+                      <div class="rounded-lg bg-orange text-sm text-center font-medium px-3 py-1 cursor-pointer">
+                        <a href="{% url "question.detail" data.id %}" class="btn btn-sm btn-primary text-white">Trả lời</a>
+                      </div>
+                    </div>
+                </div>
+              {% endfor %}
+                {% comment %} <div class="card mb-2 border border-gray-light rounded-lg shadow-sm" >
+                  <div class="card-header d-flex justify-content-between align-items-center" style="height: 70px">
+                      <div class="d-flex align-items-center">
+                          <img src="{% static "images/avatar.jpg" %}" style="width: 3rem; height: 3rem; object-fit: cover; border-radius: 50%; margin-right: 0.5rem;" alt="User avatar">
+                          <div class="flex-grow-1">
+                            <a href="#" class="text-dark text-xs font-medium hover:text-primary mt-1">
+                              <small>Đỗ Xuân Trọng</small>
+                            </a>
+                            <p class="text-gray-600 text-xs mt-0">11 minutes ago</p>
+                          </div>
+                        </div>
+                        
+                    <div class="d-flex align-items-center">
+                      <span class="badge bg-primary text-white mr-2">Tiếng Anh</span>
+                      <span class="badge bg-secondary text-white mr-2">Lớp 7</span>
+                      <span class="badge bg-success text-white">10đ</span>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-title text-dark break-words">Write a short passage of about 70 words about the advantages of a future means of transport you have chosen.</p>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div class="d-flex">
+                      <div class="d-flex align-items-center" style="margin-right: 10px">
+                        <i class="fas fa-thumbs-up"></i> <span class="text-gray-600 text-xs ml-1">0</span>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <i class="fas fa-thumbs-down"></i> <span class="text-gray-600 text-xs ml-1">0</span>
+                      </div>
+                    </div>
+                    <div class="rounded-lg bg-orange text-white text-sm text-center font-medium px-3 py-1 cursor-pointer">Trả lời</div>
+                  </div>
+                </div> {% endcomment %}
+                  
+            </div>
+            <div class="col-md-3">
+              <div class="row">
+                <div class="col-md-12 card">
+                  <div class="text-center mt-2">
+                      <h5>Thành viên hăng hái</h5>
+                  </div>
+                  <div class="card-body">
+                    <table class="table table-secondary table-hover">
+                      <thead>
+                          <tr>
+                              <th>Tên thành viên</th>
+                              <th>Điểm</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>Đỗ Xuân Trọng</td>
+                              <td>2.340</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                          <tr>
+                              <td>Zio</td>
+                              <td>2.310</td>
+                          </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+</div>
+{% endblock content %}
+

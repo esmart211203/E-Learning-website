@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% endblock title %}
+{% block content %}
+<style>
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+      }
+      
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      
+      .card-body {
+        padding: 1.5rem;
+      }
+      
+      .rounded-circle {
+        border: 2px solid #dee2e6;
+      }
+      
+      .text-muted {
+        font-size: 0.875rem;
+      }
+      
+      .badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      
+      .fa-thumbs-up, .fa-thumbs-down {
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+      
+      .fa-thumbs-up:hover, .fa-thumbs-down:hover {
+        color: #007bff;
+      }
+      .image-item {
+        width: 200px;
+        height: 200px; 
+        object-fit: cover;
+    }
+</style>
+<div class="container py-5">
+    <div class="row">
+        {% comment %} sidebar  {% endcomment %}
+        <div class="col-md-3">
+            {% include "sidebar.html" %}
+        </div>
+        <div class="col-md-9 card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="question-header d-flex justify-content-between mb-3 p-3 rounded-top" style="background: aliceblue;">
+                    <h3 class="card-title mb-0">Câu hỏi</h3>
+                    <a href="#" class="btn btn-link btn-sm ">Back</a>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'images/avatar.jpg' %}" class="rounded-circle me-2" alt="User avatar" style="width: 3rem; height: 3rem; object-fit: cover;">
+                      <div>
+                          <a href="#" class="text-dark text-decoration-none">
+                          <small class="fw-bold">{{question.user.username}}</small>
+                          </a>
+                          <p class="text-muted mb-0"><small>{{question.created_at}}</small></p>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                    <span class="badge bg-primary me-2">{{question.subject}}</span>
+                    <span class="badge bg-secondary me-2">{{question.getClass}}</span>
+                    <span class="badge bg-success">10đ</span>
+                    </div>
+                </div>
+                <div class="card-text mb-3">
+                    <p class="text-dark break-words">{{question.content}}</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex">
+                    <div class="d-flex align-items-center me-3">
+                        <i class="fas fa-thumbs-up text-muted"></i> 
+                        <span class="text-muted ms-1">0</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-thumbs-down text-muted"></i> 
+                        <span class="text-muted ms-1">0</span>
+                    </div>
+                    </div>
+                </div>
+                <div class="question-header d-flex justify-content-between mb-2 p-2 rounded-top mt-3" style="background: aliceblue;">
+                    <h3 class="card-title">Câu trả lời của bạn</h3>
+                </div>
+                {% comment %} list answer  {% endcomment %}
+                {% for data in answers  %}
+                  <div class="card-body anwser mb-2" style="border-radius: 4px;background: aliceblue;">
+                    <div class="d-flex align-items-center mb-2">
+                      <img src="{% static 'images/avatar.jpg' %}" class="rounded-circle me-2" alt="User avatar" style="width: 3rem; height: 3rem; object-fit: cover;">
+                      <div>
+                          <a href="#" class="text-dark text-decoration-none">
+                          <small class="fw-bold">{{data.user.username}}</small>
+                          </a>
+                          <p class="text-muted mb-0"><small>{{data.created_at}}</small></p>
+                      </div>
+                    </div>
+                    <div class="answer-body">
+                      <p class="text-dark mb-0">{{data.content}}</p>
+                    </div>
+                    {% for data  in data.get_images  %}
+                    <div class="container mt-4">
+                        <div class="row">
+                          <div class="col-auto">
+                            <img src="{{MEDIA_URL}}{{ data.image }}" alt="Image" class="image-item">
+                          </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                {% empty %}
+                {% comment %} emty  {% endcomment %}
+                {% endfor %}
+                {% comment %} answer form  {% endcomment %}
+                <form id="answerForm" action="{% url "answer.create" question.id %}" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <h3 class="text-center">Câu trả lời của bạn</h3>
+                    <textarea class="form-control" id="content" name="content" rows="3" placeholder="Nhập nội dung" required></textarea>
+                  </div>
+                  <div class="row g-3 align-items-center mt-1">
+                    <div class="col-auto">
+                      <input type="file" id="inputImage" name="sub_images" class="form-control" multiple>
+                    </div>
+                    <div class="col-auto">
+                      <span id="passwordHelpInline" class="form-text">
+                        You can choose 3 - 5 photos.
+                      </span>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-sm mt-3">Gửi câu hỏi</button>
+                  <div id="error-message" style="color: red; display: none;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+      document.getElementById("answerForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        let form = e.target;
+        let formData = new FormData(form);
+        let errorMessage = document.getElementById('error-message');
+
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+      })
+      .then(response => {
+        if (!response.ok) {
+            return response.json().then(json => { throw new Error(json.error) });
+        }
+        return response.json();
+      })
+      .then(data => {
+        location.reload();
+      })
+      .catch(error => {
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = 'block';
+      });
+      });
+      
+</script>
+{% endblock content %}

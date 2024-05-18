@@ -1,11 +1,7 @@
 
-{% extends "auth/base.html" %}
-{% block import %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-{% endblock import %}     
+{% extends "base.html" %}  
 {%block content%}
 <div class="container">
-    <!-- Section: Design Block -->
 <form class="" method="post" enctype="multipart/form-data">
   {% csrf_token %}
     <!-- Jumbotron -->
@@ -27,21 +23,6 @@
             <div class="card">
               <div class="card-body py-5 px-md-5">
                 <form>
-                  <!-- 2 column grid layout with text inputs for the first and last names -->
-                  <div class="row">
-                    <div class="col-md-6 mb-4">
-                      <div class="form-outline">
-                        <input type="text" id="form3Example1" name="first_name" class="form-control" />
-                        <label class="form-label" for="form3Example1">Họ</label>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                      <div class="form-outline">
-                        <input type="text" id="form3Example2"  name="last_name" class="form-control" />
-                        <label class="form-label" for="form3Example2">Tên</label>
-                      </div>
-                    </div>
-                  </div>
                   <!-- UserName input -->
                   <div class="form-outline mb-4">
                     <input type="text" id="form3Example3"  name="username" class="form-control" />
@@ -49,7 +30,7 @@
                   </div>
                   <!-- UserName input -->
                   <div class="form-outline mb-4">
-                    <input class="form-control" type="file"  name="profile_pic" id="formFile">
+                    <input class="form-control" type="file"  name="image" id="formFile">
                     <label for="formFile" class="form-label">Ảnh đại diện</label>
                   </div>
                   <!-- Email input -->
@@ -66,7 +47,7 @@
                     <label class="form-check-label" for="form2Example33">
                       Bạn đã có tài khoản!
                     </label>
-                    <a href={%url 'login'%} class="ml-2" style="color:rgb(126,195,176)"><b>Đăng nhập</b></a>
+                    <a href="{% url 'login' %}" class="ml-2" style="color:rgb(126,195,176)"><b>Đăng nhập</b></a>
                   </div>
                   <button type="submit" class="btn btn-primary btn-block mb-4" style="background: rgb(126,195,176); border: none;">
                     Đăng ký

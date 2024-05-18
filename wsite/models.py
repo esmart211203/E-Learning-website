@@ -28,6 +28,8 @@ class Question(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, default='')
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    def is_author(self, user):
+            return self.user == user
     def getClass(self):
         return f"{self.class_field}"
     def __str__(self):
@@ -44,6 +46,7 @@ class Answer(models.Model):
         return self.content 
     def get_images(self):
         return SubImages.objects.filter(answer=self)
+
 class SubImages(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, blank=True, null=True)
@@ -81,7 +84,12 @@ class Lesson(models.Model):
     
     def __str__(self):
         return self.title
-    def lesson_detail(self, lesson_id):
+    def lesson_detail(lesson_id):
         lesson = Lesson.objects.get(id=lesson_id)
         lesson.view_count = lesson.view_count + 1
         return lesson
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(max_length=255, blank=True, null=True)
+    score = models.IntegerField(default=0)

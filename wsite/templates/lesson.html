@@ -1,16 +1,32 @@
 {% extends "base.html" %}
-{% block content %}
+{% block content %}  
+<style>
+  .clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 3; 
+    line-height: 1.5; 
+    max-height: 4.5em;
+  }
+  .clamp2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2; 
+    line-height: 1.5; 
+    max-height: 4.5em;
+  }
+</style>
 <div class="container">
-        
-<div class="container">
-
-  
   <main class="container">
     <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
       <div class="col-md-6 px-0">
         <h1 class="display-4 fst-italic">{{first_lesson.title}}</h1>
-        <p class="lead my-3">{{first_lesson.description}}</p>
-        <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
+        <p class="lead my-3 clamp">{{first_lesson.description}}</p>
+        <p class="lead mb-0"><a href="{% url "lesson.detail" first_lesson.id %}" class="text-white fw-bold">Continue reading...</a></p>
       </div>
     </div>
   
@@ -20,10 +36,10 @@
         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
           <div class="col p-4 d-flex flex-column position-static">
             <strong class="d-inline-block mb-2 text-primary">Featured</strong>
-            <h3 class="mb-0">{{data.title}}</h3>
+            <h3 class="mb-0 clamp2">{{data.title}}</h3>
             <div class="mb-1 text-muted">{{data.created_at.year}}</div>
-            <p class="card-text mb-auto">{{data.description}}.</p>
-            <a href="#" class="stretched-link">Continue reading</a>
+            <p class="card-text mb-auto clamp">{{data.description}}.</p>
+            <a href="{% url "lesson.detail" data.id %}" class="stretched-link">Continue reading</a>
           </div>
           <div class="col-auto d-none d-lg-block">
           <img class="bd-placeholder-img" width="200" height="250" src="{{MEDIA_URL}}{{data.image}}" alt="image">

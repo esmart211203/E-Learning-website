@@ -1,36 +1,40 @@
 {% extends "admin/base.html" %}
 {% block content %}
 <div class="container">
-
   <div class="d-flex align-items-center justify-content-center">
     <div class="card text-center">
       <div class="card-body">
-        <h5 class="card-title">Quản lý Bài giảng</h5>
+        <h5 class="card-title">Quản lý người dùng</h5>
       </div>
     </div>
   </div>
-
+  
     <table class="table">
         <thead>
           <tr>
             <th scope="col">STT</th>
-            <th scope="col">Title</th>
-            <th scope="col">Subject</th>
-            <th scope="col">Class</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
             <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
-          {% for data in lesson %}
+          {% for data in users %}
           <tr>
             <th scope="row">{{data.id}}</th>
-            <td>{{data.title}}</td>
-            <td>{{data.subject}}</td>
-            <td>{{data.class_field}}</td>
+            <td>{{data.username}}</td>
+            <td>{{data.email}}</td>
             <td>
-              <form method="POST" action="{% url "lesson.delete" data.id %}">
+                {% if data.is_superuser %}
+                  Quản trị
+                {% else %}
+                  Người dùng
+                {% endif %}
+              </td>
+            <td>
+              <form method="POST" action="{% url "user.delete" data.id %}">
                 {% csrf_token %}
-                <a href="{% url "lesson.edit" data.id %}" class="btn btn-info btn-sm">Edit</a>
                 <button class="btn btn-sm btn-danger">Xóa</button>
               </form>
             </td>

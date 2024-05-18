@@ -7,19 +7,23 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson
+from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson, Profile
 from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib import messages
 # Create your views here.
 def index(request):
     classes = Class.objects.all()
     subjects = Subject.objects.all()
     categories = Category.objects.all()
-    questions = Question.objects.order_by('-created_at')
+    high_score_users = User.objects.order_by('-profile__score')[:10]
+    questions = Question.objects.order_by('-created_at')[:10]
     context = {
         "classes": classes,
         "subjects": subjects,
         "categories": categories,
         "questions": questions,
+        "high_score_users": high_score_users,
     }
     return render(request, 'index.html', context)
 
@@ -42,7 +46,22 @@ class LoginView(View):
             return render(request, "auth/login.html", context)
         login(request, user)
         return redirect("index")
-
+class RegisterView(View):
+    def get(self, request):
+        return render(request, "auth/signup.html")
+    def post(self, request):
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+            messages.error(request, "Tên người dùng hoặc email đã tồn tại.")
+            return redirect('auth.register')
+        user = User.objects.create_user(username=username, email=email, password=password)
+        #create profile
+        image = request.FILES.get('image')
+        profile = Profile.objects.create(user=user, avatar=image)
+        login(request, user)
+        return redirect('index')
 @login_required(login_url='login')
 def logout_user(request):
     logout(request)
@@ -64,6 +83,9 @@ def create_question(request):
         question = Question.objects.create(user=user, class_field=class_field, subject=subject, content=content, category=category)
         for file in files:
             sub_image = SubImages.objects.create(question=question,image=file)
+        profile = Profile.objects.get(user=user)
+        profile.score += 5
+        profile.save()
     return redirect("index")
 
 def detail_question(request, question_id):
@@ -80,6 +102,10 @@ def detail_question(request, question_id):
     }
     return render(request, 'detail_question.html', context)
 
+def delete_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    question.delete()
+    return redirect("index")
 @login_required(login_url='login')
 def create_answer(request, question_id):
     try:
@@ -87,7 +113,11 @@ def create_answer(request, question_id):
         answer_content = request.POST.get('content')
         if not answer_content:
             return JsonResponse({'error': 'Answer content cannot be empty'}, status=400)
-        answer = Answer.objects.create(content=answer_content, question=question, user=request.user)
+        user = request.user
+        answer = Answer.objects.create(content=answer_content, question=question, user=user)
+        profile = Profile.objects.get(user=user)
+        profile.score += 10
+        profile.save()
         files = request.FILES.getlist('sub_images')
         for file in files:
             sub_image = SubImages.objects.create(answer=answer,image=file) 
@@ -186,3 +216,19 @@ def delete_lesson(request, lesson_id):
     if request.method == 'POST':
         lesson.delete()
     return redirect('lesson.management')
+
+def lesson_detail(request, lesson_id):
+    lesson = Lesson.lesson_detail(lesson_id=lesson_id)
+    return render(request, 'lesson_detail.html', {'lesson': lesson})
+
+
+### USER
+def management_user(request):
+    users = User.objects.all
+    return render(request, 'admin/user/index.html', {'users': users})
+
+def delete_user(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST':
+        user.delete()
+    return redirect('user.management')

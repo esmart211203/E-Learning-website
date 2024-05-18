@@ -54,3 +54,24 @@ body {
 .ct {
     padding: 10px;
 }
+.table-custom {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.table-custom thead {
+    background-color: #f2f2f2;
+}
+
+.table-custom th,
+.table-custom td {
+    padding: 8px;
+}
+
+.table-custom tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #e6e6e6;
+}

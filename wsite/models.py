@@ -51,3 +51,37 @@ class SubImages(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.image.url
+
+class Test(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    score = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+class Quiz(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer1 = models.CharField(max_length=255)
+    answer2 = models.CharField(max_length=255)
+    answer3 = models.CharField(max_length=255)
+    answer4 = models.CharField(max_length=255)
+    right_answer = models.PositiveIntegerField(choices=[(1, 'Answer 1'), (2, 'Answer 2'), (3, 'Answer 3'), (4, 'Answer 4')])
+
+class Lesson(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    class_field = models.ForeignKey(Class, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255,blank=True)
+    content = models.TextField()
+    description = models.TextField(blank=True)
+    image = models.ImageField(max_length=255, blank=True, null=True)
+    view_count = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.title
+    def lesson_detail(self, lesson_id):
+        lesson = Lesson.objects.get(id=lesson_id)
+        lesson.view_count = lesson.view_count + 1
+        return lesson

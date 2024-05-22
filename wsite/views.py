@@ -7,10 +7,10 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson, Profile
+from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson, Profile, Scholarship
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-from django.contrib import messages
+from django.contrib import messages 
 # Create your views here.
 def index(request):
     classes = Class.objects.all()
@@ -126,11 +126,6 @@ def create_answer(request, question_id):
         return JsonResponse({'error': 'Question not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=400)
-    
-
-
-def view_quiz(request):
-    return render(request, 'quiz.html')
 
 def view_lesson(request):
     lessons = Lesson.objects.all()
@@ -232,3 +227,95 @@ def delete_user(request, user_id):
     if request.method == 'POST':
         user.delete()
     return redirect('user.management')
+
+### hoc bong
+def management_scholarship(request):
+    scholarships = Scholarship.objects.all()
+    return render(request, 'admin/scholarship/index.html', {'scholarships': scholarships})
+
+class CreateCholarshipView(View):
+    def get(self, request):
+        return render(request, 'admin/scholarship/create.html')
+    def post(self, request):
+        title = request.POST.get('title')
+        number_of_slots = request.POST.get('number_of_slots')
+        scholarship_value = request.POST.get('scholarship_value')
+        condition = request.POST.get('condition')
+        form = request.POST.get('form')
+        image = request.FILES.get('image')
+        scholarship = Scholarship.objects.create(
+            title=title,
+            number_of_slots=number_of_slots,
+            scholarship_value=scholarship_value,
+            condition=condition,
+            form=form,
+            image=image,
+        )
+        return redirect('scholarship.management')
+
+class EditCholarshipView(View):
+    def get(self, request, scholarship_id):
+        scholarship = get_object_or_404(Scholarship, pk=scholarship_id)
+        return render(request, 'admin/scholarship/edit.html', {'scholarship': scholarship})
+    def post(self, request, scholarship_id):
+        title = request.POST.get('title')
+        number_of_slots = request.POST.get('number_of_slots')
+        scholarship_value = request.POST.get('scholarship_value')
+        condition = request.POST.get('condition')
+        form = request.POST.get('form')
+        image = request.FILES.get('image')
+
+        scholarship = get_object_or_404(Scholarship, pk=scholarship_id)
+
+        scholarship.title = title
+        scholarship.number_of_slots = number_of_slots
+        scholarship.scholarship_value = scholarship_value
+        scholarship.condition = condition
+        scholarship.form = form
+        if image:scholarship.image = image
+
+        scholarship.save()
+        return redirect('scholarship.management')
+
+    
+def delete_scholarship(request, scholarship_id):
+    scholarship = get_object_or_404(Scholarship, pk=scholarship_id)
+    if request.method == 'POST':
+        scholarship.delete()
+    return redirect('scholarship.management')
+
+
+def scholarship_view(request):
+    scholarships = Scholarship.objects.all()
+    return render(request, 'scholarship.html', {'scholarships':scholarships})
+
+def scholarship_detail(request, scholarship_id):
+    scholarship = get_object_or_404(Scholarship, pk=scholarship_id)
+    return render(request, 'scholarship_detail.html',{'scholarship': scholarship})
+
+def chatbox(request):
+    return render(request, 'chatbox.html')
+
+
+
+def bot_response(request):
+    if request.method == 'POST':
+        question = request.POST.get('question', 'no content').lower()
+        print("Câu hỏi:", question)
+        if question == 'hi':
+            response_data = {'response': 'Xin chào!'}
+            print(response_data)
+        elif question == 'bai':
+            response_data = {'response': 'Tạm biệt!'}
+            print(response_data)
+        elif question in 'con khùng':
+            response_data = {'response': 'là là là là là là là là =))))'}
+        elif question in 'là ai':
+            response_data = {'response': 'là ai còn lâu mới nói =))))'}
+        else:
+            response_data = {'response': 'Xin lỗi, tôi không thể hiểu câu hỏi của bạn.'}
+            print(response_data)
+
+        return JsonResponse(response_data, status=200)
+    else:
+        return JsonResponse({'error': 'Yêu cầu không hợp lệ.'}, status=400)

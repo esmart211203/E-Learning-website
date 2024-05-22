@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Chat box{% endblock title %} 
+{% block content %}
+{% load static %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .chatbox {
+        width: 100%;
+        max-width: 600px;
+        margin: 50px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+    }
+    .chatbox-header {
+        background: #007bff;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    .chatbox-body {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+    }
+    .chatbox-message {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    .chatbox-message.user {
+        justify-content: flex-end;
+    }
+    .chatbox-message-content {
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 20px;
+        background: #e9ecef;
+        color: #333;
+    }
+    .chatbox-message.bot .chatbox-message-content {
+        background: #007bff;
+        color: #fff;
+    }
+    .chatbox-footer {
+        padding: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    .chatbox-footer input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+    }
+</style>
+<div class="chatbox">
+    <div class="chatbox-header">
+        <h4>Chatbox</h4>
+    </div>
+    <div class="chatbox-body" id="chatbox-body">
+        <div class="chatbox-message bot">
+            <div class="chatbox-message-content">
+                Chào bạn! Tôi là bot, có thể giúp gì cho bạn?
+            </div>
+        </div>
+    </div>
+    <form method="POST" action="{% url "chatbox.react" %}">
+        {% csrf_token %}
+        <div class="chatbox-footer">
+            <input type="text" name="question" id="chat-input" placeholder="Nhập câu hỏi...">
+        </div>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("chat-input").addEventListener("keypress", function(e) {
+            if (e.which == 13 || e.keyCode == 13) { 
+                e.preventDefault();
+                var questionInput = document.querySelector('input[name="question"]');
+                var question = questionInput.value.trim();
+                this.value = '';
+                var formData = new FormData();
+                formData.append('question', question);
+                var csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+                var url = '{% url "chatbox.react" %}';
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken 
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var chatboxBody = document.getElementById("chatbox-body");
+                    // câu hỏi của tao
+                    var userMessage = '<div class="chatbox-message user">' +
+                                          '<div class="chatbox-message-content">' + question + '</div>' +
+                                      '</div>';
+                    chatboxBody.innerHTML += userMessage;
+                    // còn đây là backend trả về hiện ra
+                    var botMessage = '<div class="chatbox-message bot">' +
+                                         '<div class="chatbox-message-content">' + data.response + '</div>' +
+                                     '</div>';
+                    chatboxBody.innerHTML += botMessage;
+                    chatboxBody.scrollTop = chatboxBody.scrollHeight;
+                })                
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });                
+            }
+        });
+    });
+    
+</script>
+{% endblock %}

@@ -22,26 +22,28 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
             <a href="{% url "user.management" %}" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
+              <i class="fas fa-users nav-icon"></i>
               <p>User management</p>
             </a>
           </li>
-          {% comment %} <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
-              <p>Quiz management</p>
+          
+          <li class="nav-item">
+            <a href="{% url "lesson.management" %}" class="nav-link">
+              <i class="fas fa-book nav-icon"></i>
+              <p>Course management</p>
+            </a>
+          </li>
+          
+          <li class="nav-item">
+            <a href="{% url "lesson.management" %}" class="nav-link">
+              <i class="fas fa-edit nav-icon"></i>
+              <p>Lesson management</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
-              <p>Test management</p>
-            </a>
-          </li> {% endcomment %}
-          <li class="nav-item">
-            <a href="{% url "lesson.management" %}" class="nav-link">
-              <i class="fas fa-circle nav-icon"></i>
-              <p>Course management</p>
+            <a href="{% url "scholarship.management" %}" class="nav-link">
+              <i class="fas fa-graduation-cap"></i>
+              <p>Scholarship management</p>
             </a>
           </li>
         </ul>

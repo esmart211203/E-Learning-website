@@ -24,8 +24,18 @@ urlpatterns = [
     path('question/<int:question_id>', views.detail_question, name='question.detail'),
     path('answer/<int:question_id>', views.create_answer, name='answer.create'),
     path('delete/question/<int:question_id>', views.delete_question, name='question.delete'),
+
+    ## scholarship
+    path('scholarships', views.scholarship_view, name='scholarship.index'),
+    path('management/scholarship', views.management_scholarship, name='scholarship.management'),
+    path('create/scholarship', views.CreateCholarshipView.as_view(), name='cholarship.create'),
+    path('delete/scholarship/<int:scholarship_id>', views.delete_scholarship, name='scholarship.delete'),
+    path('edit/scholarship/<int:scholarship_id>', views.EditCholarshipView.as_view(), name='scholarship.edit'),
+    path('scholarship/detail/<int:scholarship_id>', views.scholarship_detail, name='scholarship.detail'),
     ### front end
-    path('quiz', views.view_quiz, name='quiz.index'),
     path('lesson', views.view_lesson, name='lesson.index'),
+    path('chatbox', views.chatbox, name='chatbox.index'),
+    #API
+    path('bot-response', views.bot_response, name='chatbox.react'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

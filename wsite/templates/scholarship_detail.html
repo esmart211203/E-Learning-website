@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết học bổng{% endblock title %} 
+{% block content %}
+{% load static %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .header {
+        background: #007bff;
+        color: #fff;
+        padding: 40px 0;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .content {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .content img {
+        width: 100%;
+        height: 300px; /* Chiều cao cố định */
+        object-fit: cover; /* Cắt gọn ảnh nếu cần để phù hợp với khung hình */
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+</style>
+<div class="header">
+    <h1>Chi tiết học bổng</h1>
+</div>
+<div class="container">
+    <div class="content mb-5">
+        <h2>{{ scholarship.title }}</h2>
+        <img src="{{ scholarship.image.url }}" class="img-fluid mb-4" alt="{{ scholarship.title }}">
+        <p class="lead">{{ scholarship.scholarship_value }}</p>
+        <h4>Yêu cầu</h4>
+        <p>{{ scholarship.condition }}</p>
+        <h4>Hình thức</h4>
+        <p>{{ scholarship.form }}</p>
+        <h4>Số lượng</h4>
+        <p>{{ scholarship.number_of_slots }}</p>
+        <h4>Hạn nộp hồ sơ</h4>
+        <p>{{ scholarship.created_at|date:"d/m/Y" }}</p>
+        <div class="d-flex justify-content-between">
+            <a href="javascript:history.back()" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -34,6 +34,11 @@
                     <a class="nav-link" href="{% url "lesson.index" %}">
                         <i class="fas fa-chalkboard-teacher"></i>  Bài giảng
                     </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "chatbox.index" %}">
+                        <i class="fa-regular fa-comment"></i>  Chatbox
+                    </a>
                 </li>              
                 <li class="nav-item">
                     {% if request.user.is_authenticated %}

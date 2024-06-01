@@ -301,20 +301,18 @@ def chatbox(request):
 def bot_response(request):
     if request.method == 'POST':
         question = request.POST.get('question', 'no content').lower()
-        print("Câu hỏi:", question)
         if question == 'hi':
             response_data = {'response': 'Xin chào!'}
-            print(response_data)
         elif question == 'bai':
             response_data = {'response': 'Tạm biệt!'}
-            print(response_data)
         elif question in 'con khùng':
             response_data = {'response': 'là là là là là là là là =))))'}
         elif question in 'là ai':
             response_data = {'response': 'là ai còn lâu mới nói =))))'}
+        elif question in 'sở thích':
+            response_data = {'response': 'Tôi không có sở thích nào!'}
         else:
             response_data = {'response': 'Xin lỗi, tôi không thể hiểu câu hỏi của bạn.'}
-            print(response_data)
 
         return JsonResponse(response_data, status=200)
     else:

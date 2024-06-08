@@ -32,10 +32,16 @@ urlpatterns = [
     path('delete/scholarship/<int:scholarship_id>', views.delete_scholarship, name='scholarship.delete'),
     path('edit/scholarship/<int:scholarship_id>', views.EditCholarshipView.as_view(), name='scholarship.edit'),
     path('scholarship/detail/<int:scholarship_id>', views.scholarship_detail, name='scholarship.detail'),
+
+    ## react 
+    path('react/like/<int:question_id>', views.react_question, name='react.question.like'),
+    path('react/dislike/<int:question_id>', views.dislike_question, name='react.question.dislike'),
     ### front end
     path('lesson', views.view_lesson, name='lesson.index'),
     path('chatbox', views.chatbox, name='chatbox.index'),
     #API
     path('bot-response', views.bot_response, name='chatbox.react'),
+
+    path('search', views.search, name='search')
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

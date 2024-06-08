@@ -34,7 +34,10 @@ class Question(models.Model):
         return f"{self.class_field}"
     def __str__(self):
         return self.content
-
+    def get_count_react_question_like(self):
+            return React.objects.filter(question=self.pk, status='like').count()
+    def get_count_react_question_dislike(self):
+            return React.objects.filter(question=self.pk, status='dislike').count()
 class Answer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -86,3 +89,19 @@ class Scholarship(models.Model):
     form = models.CharField(max_length=255)
     image = models.ImageField(max_length=255, upload_to='scholarship')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+class React(models.Model):
+    STATUS_CHOICES = (
+        ("like", "Thích"),
+        ("dislike", "Không thích"),
+    )
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, null=True)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, blank=True,null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="like")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+    def get_count_react_answer(self):
+        return React.objects.filter(answer=self.answer).count()

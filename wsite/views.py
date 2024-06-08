@@ -7,10 +7,11 @@ from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson, Profile, Scholarship
+from .models import Category, Answer, Question, Subject, Class, SubImages, Lesson, Profile, Scholarship, React
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib import messages 
+from django.db.models import Q
 # Create your views here.
 def index(request):
     classes = Class.objects.all()
@@ -313,7 +314,58 @@ def bot_response(request):
             response_data = {'response': 'Tôi không có sở thích nào!'}
         else:
             response_data = {'response': 'Xin lỗi, tôi không thể hiểu câu hỏi của bạn.'}
-
         return JsonResponse(response_data, status=200)
     else:
         return JsonResponse({'error': 'Yêu cầu không hợp lệ.'}, status=400)
+    
+
+@login_required
+def react_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    profile = Profile.objects.get(user=user)
+    profile.score += 5
+    profile.save()
+    user = request.user
+    try:
+        existing_react = React.objects.get(question=question, author=user)
+        if existing_react.status == 'like':
+            existing_react.delete()
+        elif existing_react.status == 'dislike':
+            existing_react.status = 'like'
+            existing_react.save()
+    except React.DoesNotExist:
+        React.objects.create(question=question, author=user, status='like')
+
+    return redirect('question.detail', question_id=question_id)
+
+@login_required
+def dislike_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    user = request.user
+    try:
+        existing_react = React.objects.get(question=question, author=user)
+        if existing_react.status == 'like':
+            existing_react.status = 'dislike'
+            existing_react.save()
+        elif existing_react.status == 'dislike':
+            existing_react.delete()
+            return redirect('question.detail', question_id=question_id)
+    except React.DoesNotExist:
+        React.objects.create(question=question, author=user, status='dislike')
+    return redirect('question.detail', question_id=question_id)
+
+
+def search(request):
+    title = "Trang kết quả tìm kiếm"
+    query = request.GET.get('query', '')
+    if query:
+        similar_questions = Question.objects.filter(
+            Q(content__icontains=query)
+        )
+    else:
+        similar_questions = Question.objects.none()
+    context = {
+        'title': title,
+        'similar_questions': similar_questions,
+    }
+    return render(request, 'search.html', context)
